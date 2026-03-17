@@ -1,4 +1,4 @@
-﻿namespace UserService.Domain.Entity
+﻿namespace UserService.Domain.Entities
 {
     public class RefreshToken
     {
@@ -15,6 +15,5 @@
         public DateTime ExpiresAt { get; set; }
         public bool IsActive => RevokedAt == null && !IsExpired;
         public bool IsExpired => DateTime.UtcNow >= ExpiresAt;
-
     }
 }

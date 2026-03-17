@@ -1,20 +1,20 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using UserService.Domain.Entity;
-using UserService.Infra.Identity;
+using UserService.Infrastructure.Identity;
+using UserService.Domain.Entities;
 
-namespace UserService.Infra.Persistence
+namespace UserService.Infrastructure.Persistence
 {
+    //The third type parameter (Guid) in IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
+    //specifies the type of the primary key used by all Identity entities (users, roles, claims, etc.).
     public class UserDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
     {
-        public UserDbContext(DbContextOptions<UserDbContext> options) : base(options)
-        {
+        public UserDbContext(DbContextOptions<UserDbContext> options) : base(options) { }
 
-        }
-        public DbSet<Address> Addresses { get; set; }
-        public DbSet<RefreshToken> RefreshTokens { get; set; }
-        public DbSet<Client> Clients { get; set; }
+        public DbSet<Address> Addresses { get; set; } = null!;
+        public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+        public DbSet<Client> Clients { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -22,22 +22,24 @@ namespace UserService.Infra.Persistence
 
             builder.Entity<RefreshToken>(entity =>
             {
-                entity.HasOne<ApplicationUser>()
-                .WithMany(ApplicationUser => ApplicationUser.RefreshTokens)
-                .HasForeignKey(rt => rt.UserId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
+                // Configure foreign key explicitly, ensure EF uses the existing UserId column:
+                entity.HasOne<ApplicationUser>()     // Navigation to ApplicationUser
+                    .WithMany(u => u.RefreshTokens)  // Collection navigation on ApplicationUser
+                    .HasForeignKey(rt => rt.UserId)  // Explicit FK property
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             builder.Entity<Address>(entity =>
             {
-                entity.HasOne<ApplicationUser>()
-                .WithMany(ApplicationUser => ApplicationUser.Addresses)
-                .HasForeignKey(a => a.UserId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne<ApplicationUser>()      // Navigation to ApplicationUser
+                    .WithMany(u => u.Addresses)       // Collection navigation on ApplicationUser
+                    .HasForeignKey(a => a.UserId)     // Explicit FK property
+                    .IsRequired()
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
+            // Rename Identity tables here:
             builder.Entity<ApplicationUser>().ToTable("Users");
             builder.Entity<ApplicationRole>().ToTable("Roles");
             builder.Entity<IdentityUserRole<Guid>>().ToTable("UserRoles");
@@ -51,10 +53,28 @@ namespace UserService.Infra.Persistence
             var vendorRoleId = Guid.Parse("582880c3-f554-490f-a24e-526db35cffa5");
 
             builder.Entity<ApplicationRole>().HasData(
-                new ApplicationRole { Id = adminRoleId, Name = "Admin", NormalizedName = "ADMIN" },
-                new ApplicationRole { Id = customerRoleId, Name = "Customer", NormalizedName = "CUSTOMER" },
-                new ApplicationRole { Id = vendorRoleId, Name = "Vendor", NormalizedName = "VENDOR" }
-            );
+               new ApplicationRole
+               {
+                   Id = adminRoleId,
+                   Name = "Admin",
+                   NormalizedName = "ADMIN",
+                   Description = "Administrator with full permissions"
+               },
+               new ApplicationRole
+               {
+                   Id = customerRoleId,
+                   Name = "Customer",
+                   NormalizedName = "CUSTOMER",
+                   Description = "Customer with shopping permissions"
+               },
+               new ApplicationRole
+               {
+                   Id = vendorRoleId,
+                   Name = "Vendor",
+                   NormalizedName = "VENDOR",
+                   Description = "Vendor who can manage products"
+               }
+           );
 
             builder.Entity<Client>().HasData(
                 new Client { ClientId = "web", ClientName = "Web Client", Description = "Web browser clients", IsActive = true },

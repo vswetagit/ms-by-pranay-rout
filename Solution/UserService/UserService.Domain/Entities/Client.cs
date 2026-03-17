@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
-namespace UserService.Domain.Entity
+namespace UserService.Domain.Entities
 {
     [Index(nameof(ClientName), Name = "Index_ClientName_Unique", IsUnique = true)]
     public class Client
@@ -11,5 +10,5 @@ namespace UserService.Domain.Entity
         public bool IsActive { get; set; }
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }
-
 }
+

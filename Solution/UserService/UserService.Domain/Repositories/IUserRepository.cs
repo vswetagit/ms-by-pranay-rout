@@ -1,6 +1,5 @@
-﻿using UserService.Domain.Entity;
-
-namespace UserService.Domain.Repository
+﻿using UserService.Domain.Entities;
+namespace UserService.Domain.Repositories
 {
     public interface IUserRepository
     {
@@ -32,6 +31,6 @@ namespace UserService.Domain.Repository
         Task<int> GetMaxFailedAccessAttemptsAsync();
         Task<int> GetAccessFailedCountAsync(User user);
         Task<bool> IsValidClientAsync(string clientId);
-
     }
 }
+

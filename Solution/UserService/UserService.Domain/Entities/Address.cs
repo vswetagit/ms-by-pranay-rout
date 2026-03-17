@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace UserService.Domain.Entity
+﻿namespace UserService.Domain.Entities
 {
     public class Address
     {
@@ -18,6 +12,5 @@ namespace UserService.Domain.Entity
         public string Country { get; set; } = null!;
         public bool IsDefaultShipping { get; set; }
         public bool IsDefaultBilling { get; set; }
-
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace UserService.Domain.Entity
+namespace UserService.Domain.Entities
 {
     [Index(nameof(Email), Name = "Index_Email_Unique", IsUnique = true)]
     public class User
@@ -16,6 +16,6 @@ namespace UserService.Domain.Entity
         public DateTime CreatedAt { get; set; }
         public DateTime? LastLoginAt { get; set; }
         public List<Address> Addresses { get; set; } = new();
-
     }
 }
+
